@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StrackaLine 3D Green Designer</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles/main.css">
+
+    <!-- Import Map (Removed - Handled by Vite) -->
+    <!-- <script type="importmap">
+    {
+        "imports": {
+            "three": "./node_modules/three/build/three.module.js",
+            "three/examples/jsm/controls/OrbitControls.js": "./node_modules/three/examples/jsm/controls/OrbitControls.js",
+            "three/examples/jsm/controls/TransformControls.js": "./node_modules/three/examples/jsm/controls/TransformControls.js"
+        }
+    }
+    </script> -->
+</head>
+<body>
+    <canvas id="c"></canvas>
+
+    <!-- NEW: Container for left-side panels -->
+    <div id="left-panels-container">
+
+        <!-- Main Controls Panel (Moved inside container) -->
+        <div id="custom-controls-panel">
+            <h2>Green Design Tool</h2>
+
+            <h3>Green Shape</h3>
+            <div class="control-row">
+                <label for="width-slider">Width</label>
+                <div>
+                    <input type="range" id="width-slider" name="greenWidth" min="2" max="10" step="0.1">
+                    <!-- <span class="slider-value" id="width-value"></span> -->
+                </div>
+            </div>
+            <div class="control-row">
+                <label for="length-slider">Length</label>
+                <div>
+                    <input type="range" id="length-slider" name="greenLength" min="2" max="10" step="0.1">
+                    <!-- <span class="slider-value" id="length-value"></span> -->
+                </div>
+            </div>
+            <div class="control-row">
+                <label for="irregularity-slider">Irregularity</label>
+                <div>
+                    <input type="range" id="irregularity-slider" name="greenIrregularity" min="0" max="0.3" step="0.01">
+                    <!-- <span class="slider-value" id="irregularity-value"></span> -->
+                </div>
+            </div>
+            <div class="control-row">
+                <label for="noise-offset-slider">Seed</label>
+                <div>
+                    <input type="range" id="noise-offset-slider" name="noiseOffset" min="0" max="10.0" step="0.1">
+                    <!-- <span class="slider-value" id="noise-offset-value"></span> -->
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <h3>Terrain Editing</h3>
+            <div class="control-row">
+                <label for="grid-resolution-slider">Grid Resolution</label>
+                <div>
+                    <input type="range" id="grid-resolution-slider" name="gridResolution" min="6" max="10" step="1">
+                    <!-- <span class="slider-value" id="grid-resolution-value"></span> -->
+                </div>
+            </div>
+            <div class="control-row">
+                <label for="falloff-slider">Sculpt Size</label>
+                <div>
+                    <input type="range" id="falloff-slider" name="falloffRadius" min="1.5" max="3.0" step="0.1">
+                    <!-- <span class="slider-value" id="falloff-value"></span> -->
+                </div>
+            </div>
+            <button id="reset-elevation-button" class="control-button">Reset</button>
+
+            <hr class="divider">
+
+            <h3>View Options</h3>
+            <div class="control-row">
+                <label for="wireframe-toggle">Wireframe</label>
+                <input type="checkbox" id="wireframe-toggle" name="wireframeVisible">
+            </div>
+            <div class="control-row">
+                <label for="markers-toggle">Control Points</label>
+                <input type="checkbox" id="markers-toggle" name="showMarkers">
+            </div>
+            <div class="control-row">
+                <label for="slope-colors-toggle">Slope Colors</label>
+                <input type="checkbox" id="slope-colors-toggle" name="showSlopeColors">
+            </div>
+            <div class="control-row">
+                <label for="arrows-toggle">Slope Arrows</label>
+                <input type="checkbox" id="arrows-toggle" name="showArrows">
+            </div>
+            <div class="control-row">
+                <label for="contours-toggle">Contour Lines</label>
+                <input type="checkbox" id="contours-toggle" name="showContours">
+            </div>
+
+            <hr class="divider">
+            <!-- NEW: Hole Placement Button Container -->
+            <div class="button-row">
+                <button id="start-placing-holes-button" class="control-button">Place Holes</button>
+                <button id="finish-placing-holes-button" class="control-button" disabled>Finish Placing</button>
+                <button id="clear-holes-button" class="control-button">Clear Holes</button>
+            </div>
+
+        </div> <!-- End custom-controls-panel -->
+
+        <!-- NEW: Effective Size Panel -->
+        <div id="effective-size-panel">
+            <h4>Effective Green</h4>
+            <div id="effective-size-value">--%</div>
+        </div>
+
+        <!-- Color Key Legend (Moved inside container, Revised for Blocks) -->
+        <div id="color-key-panel">
+            <h4>Slope Percentage</h4>
+            <div class="color-blocks">
+                <span class="color-block" style="background-color: #87CEFA;"></span> <!-- 0-1 -->
+                <span class="color-block" style="background-color: #4169E1;"></span> <!-- 1-2 -->
+                <span class="color-block" style="background-color: #39FF14;"></span> <!-- 2-3 -->
+                <span class="color-block" style="background-color: #006400;"></span> <!-- 3-4 -->
+                <span class="color-block" style="background-color: #FF0000;"></span> <!-- 4-5 -->
+                <span class="color-block" style="background-color: #FFA500;"></span> <!-- 5-6 -->
+                <span class="color-block" style="background-color: #FF69B4;"></span> <!-- 6+ -->
+            </div>
+            <div class="color-labels">
+                <span>0%</span>
+                <span>1%</span>
+                <span>2%</span>
+                <span>3%</span>
+                <span>4%</span>
+                <span>5%</span>
+                <span>6%+</span>
+            </div>
+        </div> <!-- End color-key-panel -->
+
+    </div> <!-- End left-panels-container -->
+
+    <script type="module" src="src/main.js"></script>
+
+    <!-- Help Icon Trigger -->
+    <div id="help-icon">?</div>
+
+    <!-- Help Panel (Initially Hidden) -->
+    <div id="help-panel">
+        <!-- NEW: Header container for title and close button -->
+        <div class="help-panel-header">
+            <h3>Help</h3>
+            <span id="help-panel-close-button">&times;</span>
+        </div>
+        
+        <h4>Mouse Controls</h4>
+        <ul>
+            <li><strong>Rotate View:</strong> Click & Drag Left Mouse Button</li>
+            <li><strong>Zoom In/Out:</strong> Mouse Scroll Wheel</li>
+            <li><strong>Move View (Pan):</strong> Click & Drag Right/Middle Mouse Button</li>
+        </ul>
+
+        <h4>Instructions</h4>
+        <ol style="padding-left: 20px;"> <!-- Using ordered list for steps -->
+            <li>Adjust <strong>Green Shape</strong> settings (Width, Length, Irregularity, Seed) to create your desired outline.</li>
+            <li>Use <strong>Terrain Editing</strong> settings (Grid Resolution, Sculpt Size) to prepare for sculpting.</li>
+            <li>Click a white sphere (Control Point) to select it.</li>
+            <li>Click and drag the vertical arrow gizmo that appears to raise or lower the green.</li>
+            <li>Repeat steps 3-4 with different control points to shape the surface.</li>
+            <li>Click the background (off the green) to deselect the current control point.</li>
+            <li>Click <strong>Place Holes</strong> to enter placement mode (green areas show valid slope).</li>
+            <li>Click on a green area to place a hole marker (max 3).</li>
+            <li>Click <strong>Finish Placing</strong> or place the 3rd hole to exit placement mode.</li>
+            <li>Click <strong>Clear Holes</strong> to remove placed markers.</li>
+            <li>Use <strong>View Options</strong> (Slope Colors, Arrows, Contours) to visualize the green's characteristics.</li>
+            <li>Click <strong>Reset</strong> to flatten the green and start over.</li>
+        </ol>
+
+        <h4>Settings Explained</h4>
+        <ul>
+            <li><strong>Width/Length:</strong> Controls the base size and aspect ratio of the green.</li>
+            <li><strong>Irregularity:</strong> Adds bumps/dips to the green edge for a natural look.</li>
+            <li><strong>Seed:</strong> Changes the random pattern used for irregularity.</li>
+            <li><strong>Grid Resolution:</strong> Sets the number of control points for sculpting (more points = finer detail).</li>
+            <li><strong>Sculpt Size:</strong> Adjusts the area affected when moving a control point.</li>
+            <li><strong>Wireframe:</strong> Shows/hides the underlying grid lines.</li>
+            <li><strong>Control Points:</strong> Shows/hides the white sculpting spheres.</li>
+            <li><strong>Slope Colors:</strong> Colors the green by steepness (see key below).</li>
+            <li><strong>Slope Arrows:</strong> Shows arrows pointing downhill.</li>
+            <li><strong>Contour Lines:</strong> Shows lines of equal elevation (like a topography map).</li>
+            <li><strong>Effective Green (Panel):</strong> The percentage of the green area with a slope less than 4% (approx. where a ball can stop rolling).</li>
+        </ul>
+    </div>
+
+</body>
+</html>

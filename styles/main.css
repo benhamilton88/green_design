@@ -1,0 +1,381 @@
+body {
+    margin: 0;
+    overflow: hidden; /* Prevent scrollbars */
+    background-color: #1a1a1a; /* Dark background */
+    color: #f0f0f0; /* Light text */
+    font-family: 'Inter', sans-serif; /* Use Inter font */
+}
+
+canvas#c {
+    display: block; /* Remove default inline spacing */
+    width: 100vw;
+    height: 100vh;
+}
+
+/* --- NEW: Container for Left Panels --- */
+#left-panels-container {
+    position: fixed;
+    top: 50%; /* Center vertically */
+    left: 20px;
+    transform: translateY(-50%); /* Adjust vertical position */
+    width: 280px; /* Define width here */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between the two panels */
+    z-index: 10; /* Ensure it's above the canvas */
+}
+
+/* --- Custom Controls Panel --- */
+#custom-controls-panel {
+    /* REMOVE fixed positioning - handled by container */
+    /* position: fixed; */
+    /* top: 50%; */
+    /* left: 20px; */
+    /* transform: translateY(-50%); */
+    background-color: rgba(12, 12, 12, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    /* REMOVE width - handled by container */
+    /* width: 280px; */ 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: #cccccc;
+    font-size: 13px;
+    /* REMOVE z-index - handled by container */
+    /* z-index: 10; */ 
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+/* Panel Headings */
+#custom-controls-panel h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 600; /* Make H2 bold */
+    color: #ffffff; /* Ensure heading is white */
+}
+
+#custom-controls-panel h3 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    padding-bottom: 0;
+    font-weight: 600; /* Make H3 bold */
+    color: #ffffff; /* Ensure heading is white */
+}
+
+/* --- Control Row Styling --- */
+.control-row {
+    display: flex;
+    justify-content: space-between; /* Pushes label and input apart */
+    align-items: center; /* Vertically aligns items */
+    margin-bottom: 10px; /* Spacing between rows */
+    /* Labels and values inherit default #cccccc color */
+}
+
+.control-row label {
+    margin-right: 10px; /* Space between label and input */
+}
+
+/* Simple divider style */
+.divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.15); /* Slightly lighter divider */
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Style for slider value display */
+.slider-value {
+    min-width: 30px; /* Ensure space for value */
+    text-align: right;
+    margin-left: 5px;
+    display: inline-block; /* Allow width */
+}
+
+/* Basic button styling */
+.control-button {
+    background-color: #007bff; /* Standard UI blue */
+    border: none; /* Removed border */
+    color: #ffffff; /* White text */
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    display: block; /* Make it take full width of container */
+    width: 100%;
+    margin-top: 10px; /* Space above button */
+    font-size: inherit; /* Use panel font size */
+    font-weight: bold; /* Make button text bold */
+}
+
+.control-button:hover {
+    background-color: #0069d9; /* Darker blue */
+}
+
+.control-button:active {
+    background-color: #0056b3; /* Even darker blue */
+}
+
+/* NEW: Styling for horizontal button row */
+.button-row {
+    display: flex;
+    justify-content: space-between; /* Distribute buttons */
+    gap: 8px; /* Space between buttons */
+    margin-top: 10px; /* Space above row */
+}
+
+/* Adjust button styles within the row */
+.button-row .control-button {
+    flex: 1; /* Allow buttons to share space */
+    margin-top: 0; /* Remove individual top margin */
+    padding: 6px 8px; /* Slightly smaller padding */
+    font-size: 12px; /* Slightly smaller font */
+}
+
+/* Style for disabled button */
+.button-row .control-button:disabled {
+    background-color: #444; /* Grey out disabled button */
+    cursor: not-allowed;
+}
+
+/* --- NEW: Effective Size Panel Styling --- */
+#effective-size-panel {
+    /* Style similar to color-key-panel */
+    background-color: rgba(12, 12, 12, 0.85); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 8px;
+    padding: 10px 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: #cccccc;
+    font-size: 11px;
+    -webkit-backdrop-filter: blur(20px); 
+    backdrop-filter: blur(20px);
+}
+
+#effective-size-panel h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: 600; 
+    color: #ffffff;
+    font-size: 12px;
+}
+
+#effective-size-value {
+    font-size: 18px; /* Larger font size for percentage */
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff; /* White color for emphasis */
+    padding: 5px 0; /* Add some vertical padding */
+}
+
+/* --- Color Key Panel Styling (Revised for Blocks) --- */
+#color-key-panel {
+    /* REMOVE fixed positioning - handled by container */
+    /* position: fixed; */
+    /* left: 20px; */
+    /* bottom: 20px; */
+    /* width: 280px; */
+    background-color: rgba(12, 12, 12, 0.85); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 8px;
+    padding: 10px 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: #cccccc;
+    font-size: 11px;
+    /* REMOVE z-index - handled by container */
+    /* z-index: 10; */
+    -webkit-backdrop-filter: blur(20px); 
+    backdrop-filter: blur(20px);
+    /* ADD margin-top for spacing (handled by container gap now) */
+    /* margin-top: 10px; */
+}
+
+#color-key-panel h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: 600; 
+    color: #ffffff;
+    font-size: 12px;
+}
+
+/* --- NEW Block Key Styles --- */
+.color-blocks {
+    display: flex;
+    width: 100%;
+    height: 15px;
+    margin-bottom: 4px; /* Space between blocks and labels */
+    border-radius: 3px;
+    overflow: hidden; /* Clip corners */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Optional: border around whole bar */
+}
+
+.color-block {
+    flex-grow: 1; /* Make all blocks share width equally */
+    /* REMOVE divider lines BETWEEN blocks */
+    /* border-right: 1px solid rgba(255, 255, 255, 0.5); */
+}
+
+.color-block:last-child {
+    /* border-right: none; */ /* No longer needed */
+}
+
+.color-labels {
+    display: flex;
+    justify-content: space-around; /* Center labels under blocks */
+    width: 100%; 
+    padding: 0 1px; 
+    box-sizing: border-box;
+    font-size: 10px;
+    color: #a0a0a0;
+}
+
+.color-labels span {
+    flex-basis: 0;
+    flex-grow: 1; 
+    text-align: center;
+    /* REMOVE first/last child styles */
+}
+/* REMOVE first/last child specific styles */
+/* .color-labels span:first-child, */
+/* .color-labels span:last-child { */
+/*      opacity: 0; */
+/* } */
+
+/* REMOVE transform adjustment for intermediate labels */
+/* .color-labels span:not(:first-child):not(:last-child) { */
+/*     transform: translateX(-50%); */
+/*     max-width: 2em; */ 
+/* } */
+
+/* --- Help Icon Styling --- */
+#help-icon {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 30px;
+    height: 30px;
+    /* background-color: rgba(255, 255, 255, 0.2); */ /* Original semi-transparent white */
+    background-color: #007bff; /* Match reset button color */
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 20;
+    transition: background-color 0.2s ease;
+}
+
+#help-icon:hover {
+    /* background-color: rgba(255, 255, 255, 0.4); */
+    background-color: #0069d9; /* Match reset button hover color */
+}
+
+/* --- Help Panel Styling --- */
+#help-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    /* background-color: rgba(20, 20, 20, 0.9); */ /* Original darker */
+    background-color: rgba(12, 12, 12, 0.85); /* Match control panel background */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    color: #e0e0e0;
+    font-size: 14px;
+    z-index: 30;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    -webkit-backdrop-filter: blur(15px); 
+    backdrop-filter: blur(15px);
+}
+
+/* NEW: Header container styling */
+.help-panel-header {
+    display: flex;
+    justify-content: center; /* Center title */
+    align-items: center;    /* Vertically align items */
+    position: relative;     /* For absolute positioning of button */
+    margin-bottom: 20px;    /* Space below header */
+}
+
+/* NEW: Close button styling */
+#help-panel-close-button {
+    position: absolute;
+    /* top: 10px; */ /* Removed fixed top */
+    top: 50%; /* Vertically center */
+    transform: translateY(-50%); /* Adjust for precise centering */
+    /* right: 15px; */ /* Adjust right positioning */
+    right: 0; /* Position at the far right of the header */
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px; /* Add some padding if needed */
+    transition: color 0.2s ease;
+}
+
+#help-panel-close-button:hover {
+    color: #fff;
+}
+
+#help-panel.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
+}
+
+#help-panel h3 {
+    /* text-align: center; */ /* Centering handled by header */
+    margin-top: 0;
+    /* margin-bottom: 20px; */ /* Spacing handled by header */
+    margin-bottom: 0; /* Remove bottom margin */
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+#help-panel h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+#help-panel ul {
+    list-style: none; /* Remove default bullets */
+    padding-left: 0;
+    margin-bottom: 15px;
+}
+
+#help-panel li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+#help-panel strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* REMOVE Style for the close button */
+/* #close-help-button { ... } */
+/* #close-help-button:hover { ... } */
