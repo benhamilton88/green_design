@@ -934,10 +934,10 @@ function updateWireframeVisibility() {
  * Updates the visibility of the control point markers.
  */
 function updateControlPointVisibility() {
-    // controlPoints.forEach(cp => cp.visible = params.showMarkers);
+    controlPoints.forEach(cp => cp.visible = params.showMarkers); // Ensure individual visibility is set
     // Control visibility via the group and material
     controlPointGroup.visible = params.showMarkers;
-    controlPointMaterial.visible = params.showMarkers;
+    controlPointMaterial.visible = params.showMarkers; // Keep this for potential efficiency
 
     // Also hide/show TransformControls if they are attached and markers are hidden/shown
     if (transformControls.object && !params.showMarkers) {
