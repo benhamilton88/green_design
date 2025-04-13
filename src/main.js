@@ -1142,10 +1142,6 @@ function attemptPlaceHole(screenX, screenY) {
             holesGroup.add(holeMarker); 
             placedHoles.push(holeMarker); 
             
-            if (placedHoles.length > 0) {
-                updateFinishButtonState(true);
-            }
-            
             // *** NEW: Auto-exit if 3 holes are placed ***
             if (placedHoles.length >= 3) {
                 exitHolePlacementMode(); // Exit the mode automatically
@@ -1268,8 +1264,8 @@ function enterHolePlacementMode() {
     transformControls.enabled = false;
     // *** Hide control points explicitly ***
     controlPointGroup.visible = false; 
-    // *** NEW: Disable finish button initially ***
-    updateFinishButtonState(false);
+    // *** NEW: Enable finish button immediately on entering mode ***
+    updateFinishButtonState(true);
 }
 
 /**
@@ -1327,8 +1323,8 @@ function clearHoles() {
         holePlacementIndicator.visible = false; // Hide until next move
     }
     
-    // *** NEW: Disable finish button after clearing ***
-    updateFinishButtonState(false);
+    // *** REMOVED: Button state handled by enter/exit mode ***
+    // updateFinishButtonState(false);
 }
 
 // *** Capture the REAL function from the UI setup return value ***
