@@ -210,31 +210,41 @@ function getInterpolatedHeight(x, z, geometry, segmentsX, segmentsZ, sizeX, size
     const col = gridX * segmentsX;
     const row = gridZ * segmentsZ; // Z maps to rows
 
-    // Check bounds
-    if (col < 0 || col >= segmentsX || row < 0 || row >= segmentsZ) {
-        return 0; // Return base height or handle appropriately
-    }
+    // *** START FIX: Clamp column and row indices ***
+    // Calculate base indices and clamp them
+    let col0 = Math.floor(col);
+    let row0 = Math.floor(row);
 
-    // Get integer indices of the grid cell
-    const col0 = Math.floor(col);
-    const row0 = Math.floor(row);
-    const col1 = col0 + 1;
-    const row1 = row0 + 1;
+    col0 = Math.max(0, Math.min(col0, segmentsX - 1)); // Clamp col0 between 0 and segmentsX-1
+    row0 = Math.max(0, Math.min(row0, segmentsZ - 1)); // Clamp row0 between 0 and segmentsZ-1
+
+    // Calculate next indices and clamp them
+    let col1 = col0 + 1;
+    let row1 = row0 + 1;
+
+    col1 = Math.min(col1, segmentsX); // Clamp col1 to segmentsX (max valid index)
+    row1 = Math.min(row1, segmentsZ); // Clamp row1 to segmentsZ (max valid index)
+    // *** END FIX ***
 
     // Get interpolation factors (how far between grid lines)
-    const tx = col - col0;
-    const ty = row - row0;
-
-    // Get vertex indices (handle wrapping/clamping if necessary, though bounds check helps)
+    // Clamp the original col/row values before calculating tx/ty to avoid issues at edges
+    const clampedCol = Math.max(0, Math.min(col, segmentsX));
+    const clampedRow = Math.max(0, Math.min(row, segmentsZ));
+    const tx = clampedCol - col0;
+    const ty = clampedRow - row0;
+    
+    // Get vertex indices 
     const idx00 = row0 * vertsWidth + col0;
     const idx10 = row0 * vertsWidth + col1;
     const idx01 = row1 * vertsWidth + col0;
     const idx11 = row1 * vertsWidth + col1;
 
-    // Ensure indices are valid
-    if (idx00 >= positions.count || idx10 >= positions.count || idx01 >= positions.count || idx11 >= positions.count) {
-        return positions.getY(Math.min(idx00, positions.count - 1)); // Fallback
-    }
+    // *** REMOVED redundant check: Indices should now always be valid due to clamping ***
+    // if (idx00 >= positions.count || idx10 >= positions.count || idx01 >= positions.count || idx11 >= positions.count) {
+    //     // This fallback should ideally not be needed anymore
+    //     console.warn("Interpolation index out of bounds despite clamping.");
+    //     return positions.getY(Math.min(idx00, positions.count - 1)); // Fallback
+    // }
 
     // Get heights of the 4 corner vertices
     const y00 = positions.getY(idx00);
@@ -1014,6 +1024,8 @@ const MAX_CLICK_DISTANCE_SQ = 5 * 5; // pixels squared
 
 // *** NEW: Function passed from UI to control button ***
 let updateFinishButtonState = () => { console.error("updateFinishButtonState not initialized!"); }; // Placeholder with error
+// *** NEW: Function to control Place button state ***
+let updatePlaceButtonState = () => { console.error("updatePlaceButtonState not initialized!"); };
 
 // --- Hole Placement Functions --- NEW SECTION
 
@@ -1145,6 +1157,8 @@ function attemptPlaceHole(screenX, screenY) {
             // *** NEW: Auto-exit if 3 holes are placed ***
             if (placedHoles.length >= 3) {
                 exitHolePlacementMode(); // Exit the mode automatically
+                // *** NEW: Disable Place button ***
+                updatePlaceButtonState(false);
             }
 
         } else {
@@ -1325,6 +1339,8 @@ function clearHoles() {
     
     // *** REMOVED: Button state handled by enter/exit mode ***
     // updateFinishButtonState(false);
+    // *** NEW: Re-enable Place button ***
+    updatePlaceButtonState(true);
 }
 
 // *** Capture the REAL function from the UI setup return value ***
@@ -1349,6 +1365,12 @@ if (uiControls && typeof uiControls.updateFinishButtonState === 'function') {
     updateFinishButtonState = uiControls.updateFinishButtonState;
 } else {
     console.error("Main: Failed to capture updateFinishButtonState from UI!");
+}
+// *** NEW: Capture Place button state function ***
+if (uiControls && typeof uiControls.updatePlaceButtonState === 'function') {
+    updatePlaceButtonState = uiControls.updatePlaceButtonState;
+} else {
+    console.error("Main: Failed to capture updatePlaceButtonState from UI!");
 }
 
 // --- Initial state setup ---

@@ -21,6 +21,8 @@ export function setupUI(params, updateFunctions) {
     
     // *** Declare the function OUTSIDE the IF block ***
     let updateFinishButtonState = () => {}; // Default empty function
+    // *** NEW: Declare updatePlaceButtonState outside ***
+    let updatePlaceButtonState = () => {}; 
 
     // Clear any existing content in case of re-setup (unlikely here, but good practice)
     // panel.innerHTML = ''; 
@@ -225,10 +227,6 @@ export function setupUI(params, updateFunctions) {
              }
         });
         
-        // *** Define the function locally using function keyword ***
-        // *** MOVED function definition ABOVE the IF block ***
-        // function updateFinishButtonState(enabled) { ... }
-        
         // *** Assign the REAL function implementation here ***
         updateFinishButtonState = (enabled) => { // Use arrow function again for simplicity here
             // console.log(`UI: Setting finish button enabled state to: ${enabled}`); // REMOVED
@@ -245,9 +243,23 @@ export function setupUI(params, updateFunctions) {
             }
         }; // End of function assignment
 
-        // Set initial state (disabled)
+        // *** NEW: Assign the Place Button state function ***
+        updatePlaceButtonState = (enabled) => {
+             if (enabled) {
+                startPlacingButton.removeAttribute('disabled');
+                startPlacingButton.style.backgroundColor = ''; // Revert to default CSS rule
+                startPlacingButton.style.cursor = 'pointer';
+            } else {
+                startPlacingButton.setAttribute('disabled', true);
+                startPlacingButton.style.backgroundColor = '#444'; // Match CSS
+                startPlacingButton.style.cursor = 'not-allowed';
+            }
+        };
+
+        // Set initial state (disabled for finish, enabled for place)
         // console.log("UI: Setting initial finish button state."); // REMOVED
         updateFinishButtonState(false); // Call the assigned function
+        updatePlaceButtonState(true); // Place button starts enabled
 
     } else {
         console.error('One or more hole placement button elements not found!');
@@ -257,5 +269,5 @@ export function setupUI(params, updateFunctions) {
     
     // *** Return the panel AND the function needed by main.js ***
     // *** Now returning the variable declared outside the IF block ***
-    return { panel, updateFinishButtonState }; 
+    return { panel, updateFinishButtonState, updatePlaceButtonState }; 
 }
